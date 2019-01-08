@@ -46,9 +46,8 @@
 
 Install JSON Server
 
-* npm install json-server --save-dev
-* npm install jsonwebtoken --save (for authentication)
-* start_api.bat
+* in folder src/api: npm install
+* in the root: start_api.bat
 
 ---
 

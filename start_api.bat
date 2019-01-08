@@ -1,2 +1,2 @@
 echo "STARTING JSON API"
-node src/api/server.js
+npm run start-auth

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Refit;
-using RefitExample.Helpers;
+﻿using Refit;
+using RefitExample.Factories;
 using RefitExample.Interfaces;
 using RefitExample.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RefitExample.Services
 {

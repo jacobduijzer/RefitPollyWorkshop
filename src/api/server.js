@@ -12,6 +12,8 @@ const userdb = JSON.parse(fs.readFileSync('./users.json', 'UTF-8'))
 server.use(bodyParser.json())
 //server.use(jsonServer.defaults());
 
+router.use(delay)
+
 const SECRET_KEY = '123456789'
 const expiresIn = '1h'
 
@@ -58,7 +60,7 @@ server.use(/^(?!\/auth).*$/, (req, res, next) => {
         res.status(status).json({ status, message })
     }
 })
-router.use(delay)
+
 server.use(router)
 
 server.listen(3000, () => {

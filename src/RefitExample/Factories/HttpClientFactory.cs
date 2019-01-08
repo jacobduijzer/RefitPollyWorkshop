@@ -5,7 +5,7 @@ using RefitExample.Handlers;
 using RefitExample.Loggers;
 using RefitExample.Models;
 
-namespace RefitExample.Helpers
+namespace RefitExample.Factories
 {
     public static class HttpClientFactory
     {

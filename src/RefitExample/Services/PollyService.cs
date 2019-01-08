@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Polly;
-using Refit;
-using RefitExample.Helpers;
+﻿using Polly;
 using RefitExample.Interfaces;
 using RefitExample.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace RefitExample.Services
 {
@@ -17,14 +14,18 @@ namespace RefitExample.Services
         
         private const int NUMBER_OF_RETRIES = 3;
 
+        private const int EXCEPTIONS_ALLOWED_BEFORE_BREAKING_CIRCUIT = 3;
+
+        private const int CIRCUIT_BRAKE_TIME = 1;
+
         public PollyService(ILogger logger)
         {
             _logger = logger;
 
             _circuitBreaker = Policy.Handle<Exception>()
                 .CircuitBreakerAsync(
-                    3,
-                    TimeSpan.FromSeconds(1),
+                    EXCEPTIONS_ALLOWED_BEFORE_BREAKING_CIRCUIT,
+                    TimeSpan.FromSeconds(CIRCUIT_BRAKE_TIME),
                     (x, y) => _logger.Write("Breaking circuit"),
                     () => _logger.Write("Resetting circuit"));
         }
@@ -32,47 +33,50 @@ namespace RefitExample.Services
 
         public async Task<T> GetWithPolicy<T>(PolicyType policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
         {
+            if (policyType == PolicyType.AnyFallback && fallbackCall == null)
+                throw new ArgumentNullException(nameof(fallbackCall));
+
             _logger.Write($"GetWithPolicy: {policyType}");
             switch (policyType)
             {
                 case PolicyType.Retry:
-                    return await CreateRetryPolicy<T>()
+                    return await CreateRetryPolicy()
                         .ExecuteAsync(apiCall);
 
-                //case PolicyType.CircuitBreaker:
-                //    return await _circuitBreaker.ExecuteAsync(apiCall);
-                //    break;
-                case PolicyType.Fallback:
-                    if (fallbackCall == null)
-                        throw new ArgumentNullException(nameof(fallbackCall));
+                case PolicyType.CircuitBreaker:
+                    return await _circuitBreaker
+                        .ExecuteAsync(apiCall);
 
+                case PolicyType.Fallback:
                     return await CreateFallbackPolicy<T>(fallbackCall)
                         .ExecuteAsync(apiCall);
 
-                //    break;
-                //case PolicyType.CircuitBreakerWithFallBack:
-                //    return await fallbackPolicy.WrapAsync(_circuitBreaker).ExecuteAsync(apiCall);
-                //    break;
+                case PolicyType.CircuitBreakerWithFallBack:
+                    return await CreateFallbackPolicy<T>(fallbackCall)
+                        .WrapAsync(_circuitBreaker)
+                        .ExecuteAsync(apiCall);
+
                 case PolicyType.RetryWithFallBack:
                     if (fallbackCall == null)
                         throw new ArgumentNullException(nameof(fallbackCall));
 
                     return await CreateFallbackPolicy<T>(fallbackCall)
-                        .WrapAsync(CreateRetryPolicy<T>())
+                        .WrapAsync(CreateRetryPolicy())
                         .ExecuteAsync(apiCall);
-                    //case PolicyType.CircuitBreakerWithRetryAndFallBack:
-                    //    return  await retryPolicy.WrapAsync(fallbackPolicy).WrapAsync(_circuitBreaker).ExecuteAsync(apiCall);
-                    //    break;
-                    //default:
-                    //    return await apiCall.Invoke();
-                    //    break;
-            }
 
-            throw new NotImplementedException();
+                case PolicyType.CircuitBreakerWithRetryAndFallBack:
+                    return await CreateFallbackPolicy<T>(fallbackCall)
+                        .WrapAsync(CreateRetryPolicy())
+                        .WrapAsync(_circuitBreaker)
+                        .ExecuteAsync(apiCall);
+
+                default:
+                    return await apiCall.Invoke();
+            }
         }
 
-        private IAsyncPolicy<T> CreateRetryPolicy<T>() =>
-            Policy<T>.Handle<Exception>()
+        private IAsyncPolicy CreateRetryPolicy() =>
+            Policy.Handle<Exception>()
             .RetryAsync(NUMBER_OF_RETRIES, (exception, retryCount, context) =>
             {
                 _logger.Write("RetryPolicy invoked");

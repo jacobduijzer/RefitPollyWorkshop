@@ -9,53 +9,126 @@ using RefitExample.Services;
 
 namespace RefitExample.Programs
 {
-    public static class WithPolly
+    public class WithPolly
     {
-        private const int DELAY = 5; // 0 gives issues with json-server
+        private readonly IRemoteApiService _remoteApiService;
+        private readonly PollyService _pollyService;
+        private readonly ILogger _logger;
 
-        public static async Task Run(IRemoteApiService remoteApiService)
+        public WithPolly(IRemoteApiService remoteApiService)
+        {
+            _logger = new ConsoleLogger();
+            _remoteApiService = remoteApiService;
+            _pollyService = new PollyService(new ConsoleLogger());
+        }
+
+        private const int DELAY = 5000; // 0 gives issues with json-server
+        private const int FALLBACK_DELAY = 1; // 0 gives issues with json-server
+
+        public async Task GetAllPostsWithRetry()
         {
             try
             {
-                var pollyService = new PollyService(new ConsoleLogger());
-
-                //try
-                //{
-                //    Console.WriteLine(Program.SEPARATOR);
-                //    Console.WriteLine($"Getting all posts with retry");
-                //    var allPostsWithRetry = await pollyService.GetWithPolicy<IEnumerable<Post>>(
-                //        PolicyType.Retry,
-                //        () => remoteApiService.GetAllPostsAsync(), null).ConfigureAwait(false);
-                //    Console.WriteLine($"AllPosts result count: {allPostsWithRetry.Count()}");
-                //}
-                //catch (Exception)
-                //{
-                //    Console.WriteLine("Expected exception, timeout");
-                //}
-
-                //Console.WriteLine(Program.SEPARATOR);
-                //Console.WriteLine($"Getting all posts with fallback");
-                //var allPostsWithFallBack = await pollyService.GetWithPolicy<IEnumerable<Post>>(
-                //    PolicyType.Fallback,
-                //    () => remoteApiService.GetAllPostsAsync(),
-                //    () => remoteApiService.GetAllPostsAsync(1)).ConfigureAwait(false);
-                //Console.WriteLine($"AllPosts result count: {allPostsWithFallBack.Count()}");
-
-                Console.WriteLine(Program.SEPARATOR);
-                Console.WriteLine($"Getting all posts with retry & fallback");
-                var allPostsWithRetryAndFallBack = await pollyService.GetWithPolicy<IEnumerable<Post>>(
-                    PolicyType.RetryWithFallBack,
-                    () => remoteApiService.GetAllPostsAsync(DELAY),
-                    () => remoteApiService.GetAllPostsAsync(1)).ConfigureAwait(false);
-                Console.WriteLine($"AllPosts result count: {allPostsWithRetryAndFallBack.Count()}");
-
-
+                _logger.Write(Program.SEPARATOR);
+                _logger.Write($"Getting all posts with retry");
+                var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
+                    PolicyType.Retry,
+                    () => _remoteApiService.GetAllPostsAsync(DELAY), null).ConfigureAwait(false);
+                _logger.Write($"result count: {posts.Count()}");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Console.WriteLine(Program.SEPARATOR);
-                Console.WriteLine($"Exception");
-                Console.WriteLine($"{ex.Message}");
+                _logger.Write("Expected exception, timeout");
+            }
+        }
+
+        public async Task GetAllPostsWithFallback()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Getting all posts with fallback");
+            var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
+                    PolicyType.Fallback,
+                    () => _remoteApiService.GetAllPostsAsync(DELAY),
+                    () => _remoteApiService.GetAllPostsAsync(FALLBACK_DELAY)).ConfigureAwait(false);
+            _logger.Write($"result count: {posts.Count()}");
+        }
+
+        public async Task GetAllPostsWithRetryAndFallBack()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Getting all posts with retry & fallback");
+            var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
+                    PolicyType.RetryWithFallBack,
+                    () => _remoteApiService.GetAllPostsAsync(DELAY),
+                    () => _remoteApiService.GetAllPostsAsync(FALLBACK_DELAY)).ConfigureAwait(false);
+            _logger.Write($"result count: {posts.Count()}");
+        }
+
+        public async Task GetAllPostsWithCircuitBreaker()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Getting all posts with circuit breaker");
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
+                        PolicyType.CircuitBreaker,
+                        () => _remoteApiService.GetAllPostsAsync(DELAY), 
+                        null).ConfigureAwait(false);
+                    _logger.Write($"result count: {posts.Count()}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Write(ex.Message);
+                }                
+            }
+        }
+
+        public async Task GetAllPostsWithCircuitBreakerWithFallBack()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Getting all posts with circuit breaker");
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
+                        PolicyType.CircuitBreakerWithFallBack,
+                        () => _remoteApiService.GetAllPostsAsync(DELAY),
+                        () => _remoteApiService.GetAllPostsAsync(1)).ConfigureAwait(false);
+                    _logger.Write($"result count: {posts.Count()}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Write(ex.Message);
+                }
+            }
+        }
+
+        public async Task GetAllPostsWithCircuitBreakerWithRetryAndFallBack()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Getting all posts with circuit breaker");
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
+                        PolicyType.CircuitBreakerWithRetryAndFallBack,
+                        async () => await _remoteApiService.GetAllPostsAsync(DELAY),
+                        async () =>
+                        {
+                            // remove to show multiple breaking circuits
+                            //await Task.Delay(500);
+                            return await _remoteApiService.GetAllPostsAsync(1);
+                        }).ConfigureAwait(false);
+                    _logger.Write($"result count: {posts.Count()}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Write(ex.Message);
+                }
             }
         }
     }

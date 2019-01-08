@@ -11,7 +11,6 @@ namespace RefitExample
         public static string SEPARATOR = $"{Environment.NewLine}=========================";
         
         private static bool USE_AUTHENTICATION = true;
-        private static bool USE_POLICIES = true;
         private static LogLevel LOG_LEVEL = LogLevel.None;
 
         static async Task Main(string[] args)
@@ -26,11 +25,10 @@ namespace RefitExample
                     Password = "test123!"
                 });
 
-            
-            if(USE_POLICIES)
-                await Programs.WithPolly.Run(remoteApiService);
-            else
-                await Programs.Normal.Run(remoteApiService);
+            await new Programs.WithPolly(remoteApiService)
+                .GetAllPostsWithCircuitBreakerWithRetryAndFallBack();
+
+            //await new Programs.Normal(remoteApiService).UpdatePost();
 
             Console.WriteLine(SEPARATOR);
             Console.WriteLine("Press any key to exit");

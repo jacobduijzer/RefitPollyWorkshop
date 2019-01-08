@@ -2,46 +2,61 @@
 using System.Linq;
 using System.Threading.Tasks;
 using RefitExample.Interfaces;
+using RefitExample.Loggers;
 using RefitExample.Models;
 
 namespace RefitExample.Programs
 {
-    public static class Normal
+    public class Normal
     {
         private const int DELAY = 1; // 0 gives issues with json-server
 
-        public static async Task Run(IRemoteApiService remoteApiService)
+        private readonly ILogger _logger;
+        private readonly IRemoteApiService _remoteApiService;
+
+        public Normal(IRemoteApiService apiService)
         {
-            try
-            {
-                Console.WriteLine(Program.SEPARATOR);
-                Console.WriteLine($"Getting all posts");
-                var allPosts = await remoteApiService.GetAllPostsAsync(DELAY).ConfigureAwait(false);
-                Console.WriteLine($"AllPosts result count: {allPosts.Count()}");
+            _logger = new ConsoleLogger();
+            _remoteApiService = apiService;
+        }
 
-                Console.WriteLine(Program.SEPARATOR);
-                Console.WriteLine($"Getting single post");
-                var singlePost = await remoteApiService.GetPostByIdAsync(DELAY).ConfigureAwait(false);
-                Console.WriteLine($"Single post title: {singlePost.Title}");
+        public async Task GetAllPosts()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Getting all posts");
+            var allPosts = await _remoteApiService.GetAllPostsAsync(DELAY).ConfigureAwait(false);
+            _logger.Write($"AllPosts result count: {allPosts.Count()}");
+        }
 
-                Console.WriteLine(Program.SEPARATOR);
-                Console.WriteLine($"Adding post");
-                var newPost = await remoteApiService.AddPostAsync(new Post(1, "Test", "This is a test"), DELAY)
-                    .ConfigureAwait(false);
-                Console.WriteLine($"New post ID: {newPost.Id}");
+        public async Task<Post> GetSinglePost()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Getting single post");
+            var singlePost = await _remoteApiService.GetPostByIdAsync(DELAY).ConfigureAwait(false);
+            _logger.Write($"Single post title: {singlePost.Title}");
 
-                Console.WriteLine(Program.SEPARATOR);
-                Console.WriteLine($"Updating post {singlePost.Id}, old title: {singlePost.Title}");
-                var updatedPost = await remoteApiService.UpdateCompletePostAsync(singlePost.UpdateTitle($"Test {DateTime.Now}"), DELAY)
-                    .ConfigureAwait(false);
-                Console.WriteLine($"Updated post: {updatedPost.Id}, new title: {updatedPost.Title}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(Program.SEPARATOR);
-                Console.WriteLine($"Exception");
-                Console.WriteLine($"{ex.Message}");
-            }
+            return singlePost;
+        }
+
+        public async Task AddPost()
+        {
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Adding post");
+            var newPost = await _remoteApiService.AddPostAsync(
+                new Post(1, "Test", "This is a test"), 
+                DELAY).ConfigureAwait(false);
+            _logger.Write($"New post ID: {newPost.Id}");
+        }
+
+        public async Task UpdatePost()
+        {
+            var singlePost = await GetSinglePost();
+            _logger.Write(Program.SEPARATOR);
+            _logger.Write($"Updating post {singlePost.Id}, old title: {singlePost.Title}");
+            var updatedPost = await _remoteApiService.UpdateCompletePostAsync(
+                singlePost.UpdateTitle($"Test {DateTime.Now}"),
+                DELAY).ConfigureAwait(false);
+            _logger.Write($"Updated post: {updatedPost.Id}, new title: {updatedPost.Title}");
         }
     }
 }
