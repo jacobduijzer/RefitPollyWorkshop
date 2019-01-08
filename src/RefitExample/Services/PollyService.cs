@@ -33,7 +33,7 @@ namespace RefitExample.Services
 
         public async Task<T> GetWithPolicy<T>(PolicyType policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
         {
-            if (policyType == PolicyType.AnyFallback && fallbackCall == null)
+            if ((policyType & (PolicyType.AnyFallback)) != 0 && fallbackCall == null)
                 throw new ArgumentNullException(nameof(fallbackCall));
 
             _logger.Write($"GetWithPolicy: {policyType}");
@@ -86,8 +86,10 @@ namespace RefitExample.Services
             Policy<T>.Handle<Exception>()
             .FallbackAsync((cancellationToken) =>
             {
-                _logger.Write("Fallback invoked");
+                _logger.Write("FallbackPolicy invoked");
                 return fallbackCall.Invoke();
             });
+
+        
     }
 }
