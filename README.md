@@ -1,5 +1,7 @@
 <!-- $theme: default -->
 
+[![Build status](https://ci.appveyor.com/api/projects/status/srpvvexgfu6f2ovs/branch/master?svg=true)](https://ci.appveyor.com/project/jacobduijzer/refitpollyworkshop/branch/master) [![Sonar Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=RefitExample&metric=alert_status)](https://sonarcloud.io/dashboard?id=RefitExample) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=RefitExample&metric=coverage)](https://sonarcloud.io/dashboard?id=RefitExample)
+
 # Workshop Refit & Polly
 
 ###### Jacob Duijzer, January 2018
@@ -9,7 +11,6 @@
 # Refit
 
 Refit: The automatic type-safe REST library for .NET Core, Xamarin and .NET
-
 
 ```
 public interface IRemoteApi
@@ -26,11 +27,12 @@ public interface IRemoteApi
 	Task DeletePostByIdAsync(int id);
 }
 ```
+
 ---
 
 # Refit - sample code
 
-```	
+```
 var remoteApi = RestService
 	.For<IRemoteApi>("http://localhost:3000");
 
@@ -77,9 +79,9 @@ Policies:
 # Polly - sample code
 
 ```
-	
-// Retry multiple times, calling an action on each retry 
-// with the current exception, retry count and context 
+
+// Retry multiple times, calling an action on each retry
+// with the current exception, retry count and context
 // provided to Execute()
 var _retryPolicy = Policy.Handle<SomeExceptionType>()
 	.Retry(3, (exception, retryCount, context) =>
@@ -126,7 +128,7 @@ await _retryPolicy.ExecuteAsync(
 
 # Alternatives
 
-## Flurl 
+## Flurl
 
     C#!
     // Flurl will use 1 HttpClient instance per host
@@ -146,28 +148,28 @@ await _retryPolicy.ExecuteAsync(
 
 ---
 
-# HttpClientHandler 
+# HttpClientHandler
 
-* [MSDN Documentation](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclienthandler)
-* [Scott Hanselmans post With REFIT](https://www.hanselman.com/blog/UsingASPNETCore21sHttpClientFactoryWithRefitsRESTLibrary.aspx)
+- [MSDN Documentation](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclienthandler)
+- [Scott Hanselmans post With REFIT](https://www.hanselman.com/blog/UsingASPNETCore21sHttpClientFactoryWithRefitsRESTLibrary.aspx)
 
 ---
 
 # Setup sample project
 
-* Get the source from [GitHub](https://github.com/jacobduijzer/MyBeerInfo)
-* in folder src/api: npm install
-* in the folder src/api: npm run start
-* configure & run the console app
+- Get the source from [GitHub](https://github.com/jacobduijzer/MyBeerInfo)
+- in folder src/api: npm install
+- in the folder src/api: npm run start
+- configure & run the console app
 
 ---
 
 # Links
 
-* [Sample repository](https://github.com/jacobduijzer/MyBeerInfo)
-* [Refit](https://github.com/reactiveui/refit)
-* [Polly](https://github.com/App-vNext/Polly)
-* [JSON Server](https://github.com/typicode/json-server)
-* Presentation created from markdown with [Marp](https://yhatt.github.io/marp/)
+- [Sample repository](https://github.com/jacobduijzer/MyBeerInfo)
+- [Refit](https://github.com/reactiveui/refit)
+- [Polly](https://github.com/App-vNext/Polly)
+- [JSON Server](https://github.com/typicode/json-server)
+- Presentation created from markdown with [Marp](https://yhatt.github.io/marp/)
 
 ---
