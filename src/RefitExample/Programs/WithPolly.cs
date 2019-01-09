@@ -74,14 +74,14 @@ namespace RefitExample.Programs
                 {
                     var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
                         PolicyType.CircuitBreaker,
-                        () => _remoteApiService.GetAllPostsAsync(DELAY), 
+                        () => _remoteApiService.GetAllPostsAsync(DELAY),
                         null).ConfigureAwait(false);
                     _logger.Write($"result count: {posts.Count()}");
                 }
                 catch (Exception ex)
                 {
                     _logger.Write(ex.Message);
-                }                
+                }
             }
         }
 
@@ -116,13 +116,8 @@ namespace RefitExample.Programs
                 {
                     var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
                         PolicyType.CircuitBreakerWithRetryAndFallBack,
-                        async () => await _remoteApiService.GetAllPostsAsync(DELAY),
-                        async () =>
-                        {
-                            // remove to show multiple breaking circuits
-                            //await Task.Delay(500);
-                            return await _remoteApiService.GetAllPostsAsync(1);
-                        }).ConfigureAwait(false);
+                        () => _remoteApiService.GetAllPostsAsync(DELAY),
+                        () => _remoteApiService.GetAllPostsAsync(1)).ConfigureAwait(false);
                     _logger.Write($"result count: {posts.Count()}");
                 }
                 catch (Exception ex)

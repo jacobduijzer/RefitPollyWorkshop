@@ -8,14 +8,13 @@ namespace RefitExample.Services
 {
     public class PollyService
     {
-        private readonly ILogger _logger;        
+        private readonly ILogger _logger;
 
         private readonly IAsyncPolicy _circuitBreaker;
-        
+
         private const int NUMBER_OF_RETRIES = 3;
 
         private const int EXCEPTIONS_ALLOWED_BEFORE_BREAKING_CIRCUIT = 3;
-                
 
         public PollyService(ILogger logger, int circuitBreakingTimeInMs = 1000)
         {
@@ -28,7 +27,6 @@ namespace RefitExample.Services
                     (x, y) => _logger.Write("Breaking circuit"),
                     () => _logger.Write("Resetting circuit"));
         }
-
 
         public async Task<T> GetWithPolicy<T>(PolicyType policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
         {
@@ -88,7 +86,5 @@ namespace RefitExample.Services
                 _logger.Write("FallbackPolicy invoked");
                 return fallbackCall.Invoke();
             });
-
-        
     }
 }

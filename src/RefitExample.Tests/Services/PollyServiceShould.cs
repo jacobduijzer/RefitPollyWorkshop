@@ -40,8 +40,8 @@ namespace RefitExample.Tests.Services
             var mockLogger = new Mock<ILogger>();
             mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("RetryPolicy invoked")))).Verifiable();
             var pollyService = new PollyService(mockLogger.Object);
-            
-            var action = new Func<Task>(async () => 
+
+            var action = new Func<Task>(async () =>
                 await pollyService.GetWithPolicy<string>(PolicyType.Retry,
                     () => throw new Exception("BOEM"),
                     null
@@ -53,15 +53,15 @@ namespace RefitExample.Tests.Services
         }
 
         [Fact]
-        public async Task FallbackTest()
+        public async Task ReturnFallbackData()
         {
             var mockLogger = new Mock<ILogger>();
             mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("FallbackPolicy invoked")))).Verifiable();
             var pollyService = new PollyService(mockLogger.Object);
-            
+
             var result = await pollyService.GetWithPolicy<string>(PolicyType.Fallback,
                     () => throw new Exception("BOEM"),
-                    () => Task.FromResult("test") 
+                    () => Task.FromResult("test")
                 );
 
             result.Should().Be("test");
@@ -92,11 +92,11 @@ namespace RefitExample.Tests.Services
         {
             var mockLogger = new Mock<ILogger>();
             mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit")))).Verifiable();
-            
+
             var pollyService = new PollyService(mockLogger.Object, 10);
-                        
+
             for (int i = 0; i < 10; i++)
-            {                
+            {
                 try
                 {
                     var posts = await pollyService.GetWithPolicy<string>(
@@ -113,8 +113,79 @@ namespace RefitExample.Tests.Services
                     // expected
                 }
             }
-                       
+
             mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit"))), Times.AtLeast(1));
+        }
+
+        [Fact]
+        public async Task RetryThreeTimesAndReturnFallbackData()
+        {
+            var mockLogger = new Mock<ILogger>();
+            mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("RetryPolicy invoked")))).Verifiable();
+
+            var pollyService = new PollyService(mockLogger.Object);
+
+            var data = await pollyService.GetWithPolicy<string>(
+                                PolicyType.RetryWithFallBack,
+                                () => throw new Exception("BOEM"),
+                                () => Task.FromResult("test")).ConfigureAwait(false);
+
+            data.Should().Be("test");
+
+            mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("RetryPolicy invoked"))), Times.Exactly(3));
+        }
+
+        [Fact]
+        public async Task BreakCircuitReturnFallBackData()
+        {
+            var mockLogger = new Mock<ILogger>();
+            mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("FallbackPolicy invoked")))).Verifiable();
+            mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit")))).Verifiable();
+
+            var pollyService = new PollyService(mockLogger.Object);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var data = await pollyService.GetWithPolicy<string>(
+                PolicyType.CircuitBreakerWithFallBack,
+                () => throw new Exception("BOEM"),
+                () => Task.FromResult("test")).ConfigureAwait(false);
+
+                data.Should().Be("test");
+                mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("FallbackPolicy invoked"))), Times.AtLeastOnce());
+            }
+
+            mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit"))), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        public async Task BreakCircuitRetryAndFinallyReturnFallbackData()
+        {
+            var mockLogger = new Mock<ILogger>();
+            mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("FallbackPolicy invoked")))).Verifiable();
+            mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit")))).Verifiable();
+            mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("RetryPolicy invoked")))).Verifiable();
+
+            var pollyService = new PollyService(mockLogger.Object);
+
+            for (int i = 0; i < 10; i++)
+            {
+                try
+                {
+                    var data = await pollyService.GetWithPolicy<string>(
+                        PolicyType.CircuitBreakerWithRetryAndFallBack,
+                        () => throw new Exception("BOEM"),
+                        () => Task.FromResult("test")).ConfigureAwait(false);
+                    data.Should().Be("test");
+                    mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("FallbackPolicy invoked"))), Times.AtLeastOnce());
+                    mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("RetryPolicy invoked"))), Times.Exactly(3));
+                }
+                catch (Exception ex)
+                {
+                    // expected
+                }
+            }
+            mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit"))), Times.AtLeastOnce());
         }
     }
 }
