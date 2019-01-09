@@ -98,7 +98,7 @@ await _retryPolicy.ExecuteAsync(
 
 # Polly - Scenario 1
 
-## Timeout
+## Retry
 
 ---
 
@@ -116,7 +116,7 @@ await _retryPolicy.ExecuteAsync(
 
 # Polly - Scenario 4
 
-## Timeout with fallback
+## Retry with fallback
 
 ---
 
