@@ -1,18 +1,19 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28315.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RefitExample", "RefitExample\RefitExample.csproj", "{8194801A-3693-4F42-BC05-30D485AF6B5E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8D6D7F7-FB0E-4F6B-B05A-0CA70B741362}"
 	ProjectSection(SolutionItems) = preProject
+		..\appveyor.yml = ..\appveyor.yml
 		api\package.json = api\package.json
 		..\README.md = ..\README.md
 		api\server.js = api\server.js
 		..\start_api.bat = ..\start_api.bat
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.Tests", "RefitExample.Tests\RefitExample.Tests.csproj", "{C0BF2DD7-A0E6-43F1-BB86-BB1820ABA35D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RefitExample.Tests", "RefitExample.Tests\RefitExample.Tests.csproj", "{C0BF2DD7-A0E6-43F1-BB86-BB1820ABA35D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

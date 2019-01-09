@@ -7,7 +7,7 @@ before_build:
 build_script:
   - SonarScanner.MSBuild.exe begin /k:"jacobduijzer_RefitExample" /d:sonar.cs.opencover.reportsPaths="src/RefitExample.Tests/RefitExample.Tests.coverage.xml" /d:sonar.organization="jacobduijzer-github" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="%SONARTOKEN%"
   - dotnet build src/RefitExample.sln
-  - dotnet test --no-build src/RefitExample.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=RefitExample.Tests.coverage.xml
+  - dotnet test --no-build src/RefitExample.Tests/RefitExample.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=RefitExample.Tests.coverage.xml
   - SonarScanner.MSBuild.exe end /d:sonar.login="%SONARTOKEN%"
 
 environment:
