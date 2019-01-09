@@ -1,0 +1,15 @@
+before_build:
+  # install tools
+  - choco install msbuild-sonarqube-runner
+  # restore packages
+  - nuget restore src/RefitExample.sln
+
+build_script:
+  - SonarScanner.MSBuild.exe begin /k:"jacobduijzer_RefitExample" /d:sonar.cs.opencover.reportsPaths="src/RefitExample.Tests/RefitExample.Tests.coverage.xml" /d:sonar.organization="jacobduijzer-github" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.login="%SONARTOKEN%"
+  - dotnet build src/RefitExample.sln
+  - dotnet test --no-build src/RefitExampleTests/RefitExample.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=RefitExample.Tests.coverage.xml
+  - SonarScanner.MSBuild.exe end /d:sonar.login="%SONARTOKEN%"
+
+environment:
+  SONARTOKEN:
+    secure: aedz7+yaRe8ed6AejBjaZ16hib/NuHHUo+JQ8UjW+H93wvkxsHQlPhpLlW6j2B41

@@ -4,7 +4,7 @@ using RefitExample.Models;
 using RefitExample.Services;
 using Xunit;
 
-namespace RefitExample.Testss.Services
+namespace RefitExample.Tests.Services
 {
     public class RemoteApiServiceShould
     {

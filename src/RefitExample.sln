@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\start_api.bat = ..\start_api.bat
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.Testss", "RefitExample.Testss\RefitExample.Testss.csproj", "{C0BF2DD7-A0E6-43F1-BB86-BB1820ABA35D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefitExample.Tests", "RefitExample.Tests\RefitExample.Tests.csproj", "{C0BF2DD7-A0E6-43F1-BB86-BB1820ABA35D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

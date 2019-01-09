@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace RefitExample.Testss.Services
+namespace RefitExample.Tests.Services
 {
     public class PollyServiceShould
     {

@@ -2,7 +2,7 @@
 using System;
 using Xunit.Abstractions;
 
-namespace RefitExample.Testss
+namespace RefitExample.Tests
 {
     public class TestLogger : ILogger
     {
