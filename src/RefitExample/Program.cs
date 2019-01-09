@@ -26,7 +26,7 @@ namespace RefitExample
                 });
 
             await new Programs.WithPolly(remoteApiService)
-                .GetAllPostsWithCircuitBreakerWithRetryAndFallBack();
+                .GetAllPostsWithCircuitBreaker();
 
             //await new Programs.Normal(remoteApiService).UpdatePost();
 

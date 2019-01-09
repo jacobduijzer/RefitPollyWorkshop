@@ -15,17 +15,16 @@ namespace RefitExample.Services
         private const int NUMBER_OF_RETRIES = 3;
 
         private const int EXCEPTIONS_ALLOWED_BEFORE_BREAKING_CIRCUIT = 3;
+                
 
-        private const int CIRCUIT_BRAKE_TIME = 1;
-
-        public PollyService(ILogger logger)
+        public PollyService(ILogger logger, int circuitBreakingTimeInMs = 1000)
         {
             _logger = logger;
 
             _circuitBreaker = Policy.Handle<Exception>()
                 .CircuitBreakerAsync(
                     EXCEPTIONS_ALLOWED_BEFORE_BREAKING_CIRCUIT,
-                    TimeSpan.FromSeconds(CIRCUIT_BRAKE_TIME),
+                    TimeSpan.FromMilliseconds(circuitBreakingTimeInMs),
                     (x, y) => _logger.Write("Breaking circuit"),
                     () => _logger.Write("Resetting circuit"));
         }

@@ -88,26 +88,33 @@ namespace RefitExample.Tests.Services
         }
 
         [Fact]
-        public void BreakCircuitAndThrow()
+        public async Task BreakCircuitAndThrow()
         {
             var mockLogger = new Mock<ILogger>();
-            mockLogger.Setup(x => x.Write(It.IsAny<string>())).Verifiable();
-            var pollyService = new PollyService(mockLogger.Object);
-
-            var action = new Func<Task>(async () =>
-            {
-                for (int i = 0; i < 10; i++)
+            mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit")))).Verifiable();
+            
+            var pollyService = new PollyService(mockLogger.Object, 10);
+                        
+            for (int i = 0; i < 10; i++)
+            {                
+                try
                 {
-                    await pollyService.GetWithPolicy<string>(PolicyType.CircuitBreaker,
-                        () => throw new Exception("BOEM"),
-                        null
-                    );
+                    var posts = await pollyService.GetWithPolicy<string>(
+                        PolicyType.CircuitBreaker,
+                        async () =>
+                        {
+                            await Task.Delay(40);
+                            throw new Exception("BOEM");
+                        },
+                        null).ConfigureAwait(false);
                 }
-            });
-
-            action.Should().Throw<Exception>().WithMessage("BOEM");
-            mockLogger.VerifyAll();
-                //(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit"))), Times.Exactly(1));
+                catch (Exception ex)
+                {
+                    // expected
+                }
+            }
+                       
+            mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit"))), Times.AtLeast(1));
         }
     }
 }
