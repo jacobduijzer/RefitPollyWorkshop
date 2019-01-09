@@ -1,2 +1,2 @@
 echo "STARTING JSON API"
-npm run start-auth
+npm run start
