@@ -126,6 +126,10 @@ await _retryPolicy.ExecuteAsync(
 
 ---
 
+# Polly - Unit testing
+
+---
+
 # Alternatives
 
 ## Flurl
