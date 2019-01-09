@@ -33,6 +33,11 @@ namespace RefitExample.Services
             if ((policyType & (PolicyType.AnyFallback)) != 0 && fallbackCall == null)
                 throw new ArgumentNullException(nameof(fallbackCall));
 
+            return await ExecuteWithPolicy<T>(policyType, apiCall, fallbackCall);
+        }
+
+        private async Task<T> ExecuteWithPolicy<T>(PolicyType policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
+        {
             _logger.Write($"GetWithPolicy: {policyType}");
             switch (policyType)
             {
@@ -54,9 +59,6 @@ namespace RefitExample.Services
                         .ExecuteAsync(apiCall);
 
                 case PolicyType.RetryWithFallBack:
-                    if (fallbackCall == null)
-                        throw new ArgumentNullException(nameof(fallbackCall));
-
                     return await CreateFallbackPolicy<T>(fallbackCall)
                         .WrapAsync(CreateRetryPolicy())
                         .ExecuteAsync(apiCall);
