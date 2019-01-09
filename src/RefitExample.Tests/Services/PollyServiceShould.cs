@@ -187,5 +187,15 @@ namespace RefitExample.Tests.Services
             }
             mockLogger.Verify(x => x.Write(It.Is<string>(y => y.Equals("Breaking circuit"))), Times.AtLeastOnce());
         }
+
+        [Fact]
+        public async Task ExecuteWithoutPolicies()
+        {
+            var result = await _pollyService.GetWithPolicy<string>(
+                PolicyType.None,
+                () => Task.FromResult("test"),
+                null);
+            result.Should().Be("test");
+        }
     }
 }
