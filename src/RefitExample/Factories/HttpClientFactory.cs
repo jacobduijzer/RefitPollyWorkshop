@@ -1,15 +1,15 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using RefitExample.Handlers;
+﻿using RefitExample.Handlers;
 using RefitExample.Loggers;
 using RefitExample.Models;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace RefitExample.Factories
 {
     public static class HttpClientFactory
     {
-        public static HttpClient GetHttpClient(LogLevel logLevel, Func<Task<LoginResult>> getToken = null)
+        public static HttpClient GetHttpClient(LogLevel logLevel, TimeSpan timeout, Func<Task<LoginResult>> getToken = null)
         {
             HttpClient httpClient;
 
@@ -17,7 +17,7 @@ namespace RefitExample.Factories
             {
                 case LogLevel.Debug:
                 case LogLevel.Information:
-                    if(getToken != null)
+                    if (getToken != null)
                         httpClient = new HttpClient(new LoggingHandler(new AuthenticatedHttpClientHandler(getToken), new ConsoleLogger(), logLevel));
                     else
                         httpClient = new HttpClient(new LoggingHandler(new HttpClientHandler(), new ConsoleLogger(), logLevel));
@@ -32,7 +32,7 @@ namespace RefitExample.Factories
             }
 
             httpClient.BaseAddress = new Uri(Constants.API_BASE_URL);
-            httpClient.Timeout = Constants.TIMEOUT;
+            httpClient.Timeout = timeout;
 
             return httpClient;
         }

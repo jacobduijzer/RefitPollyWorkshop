@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using RefitExample.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using RefitExample.Models;
 
 namespace RefitExample.Interfaces
 {
