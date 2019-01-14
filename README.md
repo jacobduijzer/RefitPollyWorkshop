@@ -170,7 +170,7 @@ await _retryPolicy.ExecuteAsync(
 
 # Links
 
-- [Sample repository](https://github.com/jacobduijzer/MyBeerInfo)
+- [Sample repository](https://github.com/jacobduijzer/RefitPollyWorkshop)
 - [Refit](https://github.com/reactiveui/refit)
 - [Polly](https://github.com/App-vNext/Polly)
 - [JSON Server](https://github.com/typicode/json-server)
