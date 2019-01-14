@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using RefitExample.Interfaces;
+﻿using RefitExample.Interfaces;
 using RefitExample.Loggers;
 using RefitExample.Models;
 using RefitExample.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RefitExample.Programs
 {
@@ -32,7 +32,7 @@ namespace RefitExample.Programs
                 _logger.Write(Program.SEPARATOR);
                 _logger.Write($"Getting all posts with retry");
                 var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
-                    PolicyType.Retry,
+                    PolicyTypes.Retry,
                     () => _remoteApiService.GetAllPostsAsync(DELAY), null).ConfigureAwait(false);
                 _logger.Write($"result count: {posts.Count()}");
             }
@@ -47,7 +47,7 @@ namespace RefitExample.Programs
             _logger.Write(Program.SEPARATOR);
             _logger.Write($"Getting all posts with fallback");
             var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
-                    PolicyType.Fallback,
+                    PolicyTypes.Fallback,
                     () => _remoteApiService.GetAllPostsAsync(DELAY),
                     () => _remoteApiService.GetAllPostsAsync(FALLBACK_DELAY)).ConfigureAwait(false);
             _logger.Write($"result count: {posts.Count()}");
@@ -58,7 +58,7 @@ namespace RefitExample.Programs
             _logger.Write(Program.SEPARATOR);
             _logger.Write($"Getting all posts with retry & fallback");
             var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
-                    PolicyType.RetryWithFallBack,
+                    PolicyTypes.RetryWithFallBack,
                     () => _remoteApiService.GetAllPostsAsync(DELAY),
                     () => _remoteApiService.GetAllPostsAsync(FALLBACK_DELAY)).ConfigureAwait(false);
             _logger.Write($"result count: {posts.Count()}");
@@ -73,7 +73,7 @@ namespace RefitExample.Programs
                 try
                 {
                     var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
-                        PolicyType.CircuitBreaker,
+                        PolicyTypes.CircuitBreaker,
                         () => _remoteApiService.GetAllPostsAsync(DELAY),
                         null).ConfigureAwait(false);
                     _logger.Write($"result count: {posts.Count()}");
@@ -94,7 +94,7 @@ namespace RefitExample.Programs
                 try
                 {
                     var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
-                        PolicyType.CircuitBreakerWithFallBack,
+                        PolicyTypes.CircuitBreakerWithFallBack,
                         () => _remoteApiService.GetAllPostsAsync(DELAY),
                         () => _remoteApiService.GetAllPostsAsync(1)).ConfigureAwait(false);
                     _logger.Write($"result count: {posts.Count()}");
@@ -115,7 +115,7 @@ namespace RefitExample.Programs
                 try
                 {
                     var posts = await _pollyService.GetWithPolicy<IEnumerable<Post>>(
-                        PolicyType.CircuitBreakerWithRetryAndFallBack,
+                        PolicyTypes.CircuitBreakerWithRetryAndFallBack,
                         () => _remoteApiService.GetAllPostsAsync(DELAY),
                         () => _remoteApiService.GetAllPostsAsync(1)).ConfigureAwait(false);
                     _logger.Write($"result count: {posts.Count()}");

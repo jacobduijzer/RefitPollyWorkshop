@@ -3,7 +3,7 @@
 namespace RefitExample.Models
 {
     [Flags]
-    public enum PolicyType
+    public enum PolicyTypes
     {
         None = 0,
         Retry = 1 << 1,

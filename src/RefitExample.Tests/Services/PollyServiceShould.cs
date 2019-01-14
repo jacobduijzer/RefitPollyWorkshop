@@ -26,11 +26,11 @@ namespace RefitExample.Tests.Services
             _pollyService.Should().BeOfType<PollyService>();
 
         [Theory]
-        [InlineData(PolicyType.CircuitBreakerWithFallBack)]
-        [InlineData(PolicyType.CircuitBreakerWithRetryAndFallBack)]
-        [InlineData(PolicyType.Fallback)]
-        [InlineData(PolicyType.RetryWithFallBack)]
-        public void ThrowWhenFallbackIsNull(PolicyType type) =>
+        [InlineData(PolicyTypes.CircuitBreakerWithFallBack)]
+        [InlineData(PolicyTypes.CircuitBreakerWithRetryAndFallBack)]
+        [InlineData(PolicyTypes.Fallback)]
+        [InlineData(PolicyTypes.RetryWithFallBack)]
+        public void ThrowWhenFallbackIsNull(PolicyTypes type) =>
             new Func<Task>(async () => await _pollyService.GetWithPolicy<string>(type, () => default(Task<string>), null))
             .Should().Throw<ArgumentNullException>();
 
@@ -42,7 +42,7 @@ namespace RefitExample.Tests.Services
             var pollyService = new PollyService(mockLogger.Object);
 
             var action = new Func<Task>(async () =>
-                await pollyService.GetWithPolicy<string>(PolicyType.Retry,
+                await pollyService.GetWithPolicy<string>(PolicyTypes.Retry,
                     () => throw new Exception("BOEM"),
                     null
                 ));
@@ -59,7 +59,7 @@ namespace RefitExample.Tests.Services
             mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("FallbackPolicy invoked")))).Verifiable();
             var pollyService = new PollyService(mockLogger.Object);
 
-            var result = await pollyService.GetWithPolicy<string>(PolicyType.Fallback,
+            var result = await pollyService.GetWithPolicy<string>(PolicyTypes.Fallback,
                     () => throw new Exception("BOEM"),
                     () => Task.FromResult("test")
                 );
@@ -76,7 +76,7 @@ namespace RefitExample.Tests.Services
             mockLogger.Setup(x => x.Write(It.Is<string>(y => y.Equals("FallbackPolicy invoked")))).Verifiable();
             var pollyService = new PollyService(mockLogger.Object);
 
-            var result = await pollyService.GetWithPolicy<string>(PolicyType.RetryWithFallBack,
+            var result = await pollyService.GetWithPolicy<string>(PolicyTypes.RetryWithFallBack,
                     () => throw new Exception("BOEM"),
                     () => Task.FromResult("test")
                 );
@@ -100,7 +100,7 @@ namespace RefitExample.Tests.Services
                 try
                 {
                     var posts = await pollyService.GetWithPolicy<string>(
-                        PolicyType.CircuitBreaker,
+                        PolicyTypes.CircuitBreaker,
                         async () =>
                         {
                             await Task.Delay(40);
@@ -126,7 +126,7 @@ namespace RefitExample.Tests.Services
             var pollyService = new PollyService(mockLogger.Object);
 
             var data = await pollyService.GetWithPolicy<string>(
-                                PolicyType.RetryWithFallBack,
+                                PolicyTypes.RetryWithFallBack,
                                 () => throw new Exception("BOEM"),
                                 () => Task.FromResult("test")).ConfigureAwait(false);
 
@@ -147,7 +147,7 @@ namespace RefitExample.Tests.Services
             for (int i = 0; i < 10; i++)
             {
                 var data = await pollyService.GetWithPolicy<string>(
-                PolicyType.CircuitBreakerWithFallBack,
+                PolicyTypes.CircuitBreakerWithFallBack,
                 () => throw new Exception("BOEM"),
                 () => Task.FromResult("test")).ConfigureAwait(false);
 
@@ -173,7 +173,7 @@ namespace RefitExample.Tests.Services
                 try
                 {
                     var data = await pollyService.GetWithPolicy<string>(
-                        PolicyType.CircuitBreakerWithRetryAndFallBack,
+                        PolicyTypes.CircuitBreakerWithRetryAndFallBack,
                         () => throw new Exception("BOEM"),
                         () => Task.FromResult("test")).ConfigureAwait(false);
                     data.Should().Be("test");
@@ -192,7 +192,7 @@ namespace RefitExample.Tests.Services
         public async Task ExecuteWithoutPolicies()
         {
             var result = await _pollyService.GetWithPolicy<string>(
-                PolicyType.None,
+                PolicyTypes.None,
                 () => Task.FromResult("test"),
                 null);
             result.Should().Be("test");

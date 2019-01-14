@@ -28,42 +28,42 @@ namespace RefitExample.Services
                     () => _logger.Write("Resetting circuit"));
         }
 
-        public async Task<T> GetWithPolicy<T>(PolicyType policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
+        public async Task<T> GetWithPolicy<T>(PolicyTypes policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
         {
-            if ((policyType & (PolicyType.AnyFallback)) != 0 && fallbackCall == null)
+            if ((policyType & (PolicyTypes.AnyFallback)) != 0 && fallbackCall == null)
                 throw new ArgumentNullException(nameof(fallbackCall));
 
             return await ExecuteWithPolicy<T>(policyType, apiCall, fallbackCall);
         }
 
-        private async Task<T> ExecuteWithPolicy<T>(PolicyType policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
+        private async Task<T> ExecuteWithPolicy<T>(PolicyTypes policyType, Func<Task<T>> apiCall, Func<Task<T>> fallbackCall)
         {
             _logger.Write($"GetWithPolicy: {policyType}");
             switch (policyType)
             {
-                case PolicyType.Retry:
+                case PolicyTypes.Retry:
                     return await CreateRetryPolicy()
                         .ExecuteAsync(apiCall);
 
-                case PolicyType.CircuitBreaker:
+                case PolicyTypes.CircuitBreaker:
                     return await _circuitBreaker
                         .ExecuteAsync(apiCall);
 
-                case PolicyType.Fallback:
+                case PolicyTypes.Fallback:
                     return await CreateFallbackPolicy<T>(fallbackCall)
                         .ExecuteAsync(apiCall);
 
-                case PolicyType.CircuitBreakerWithFallBack:
+                case PolicyTypes.CircuitBreakerWithFallBack:
                     return await CreateFallbackPolicy<T>(fallbackCall)
                         .WrapAsync(_circuitBreaker)
                         .ExecuteAsync(apiCall);
 
-                case PolicyType.RetryWithFallBack:
+                case PolicyTypes.RetryWithFallBack:
                     return await CreateFallbackPolicy<T>(fallbackCall)
                         .WrapAsync(CreateRetryPolicy())
                         .ExecuteAsync(apiCall);
 
-                case PolicyType.CircuitBreakerWithRetryAndFallBack:
+                case PolicyTypes.CircuitBreakerWithRetryAndFallBack:
                     return await CreateFallbackPolicy<T>(fallbackCall)
                         .WrapAsync(CreateRetryPolicy())
                         .WrapAsync(_circuitBreaker)
