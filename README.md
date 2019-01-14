@@ -1,13 +1,8 @@
 <!-- $theme: default -->
 
-| Build Info                                                                                                                                                                            |
-| :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [![Build status](https://ci.appveyor.com/api/projects/status/srpvvexgfu6f2ovs/branch/master?svg=true)](https://ci.appveyor.com/project/jacobduijzer/refitpollyworkshop/branch/master) |
-| [![Sonar Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=RefitExample&metric=alert_status)](https://sonarcloud.io/dashboard?id=RefitExample)                   |
-| [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=RefitExample&metric=coverage)](https://sonarcloud.io/dashboard?id=RefitExample)                            |
+[![Build status](https://ci.appveyor.com/api/projects/status/srpvvexgfu6f2ovs/branch/master?svg=true)](https://ci.appveyor.com/project/jacobduijzer/refitpollyworkshop/branch/master) [![Sonar Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=RefitExample&metric=alert_status)](https://sonarcloud.io/dashboard?id=RefitExample) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=RefitExample&metric=coverage)](https://sonarcloud.io/dashboard?id=RefitExample)
 
-|[![Windows Build history](https://buildstats.info/appveyor/chart/jacobduijzer/refitpollyworkshop?branch=master&includeBuildsFromPullRequest=false)](https://ci.appveyor.com/project/jacobduijzer/refitpollyworkshop/history?branch=master)
-|
+[![Windows Build history](https://buildstats.info/appveyor/chart/jacobduijzer/refitpollyworkshop?branch=master&includeBuildsFromPullRequest=false)](https://ci.appveyor.com/project/jacobduijzer/refitpollyworkshop/history?branch=master)
 
 # Workshop Refit & Polly
 
