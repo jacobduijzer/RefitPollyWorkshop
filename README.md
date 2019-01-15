@@ -128,13 +128,18 @@ await _retryPolicy.ExecuteAsync(
 
 ---
 
+# HttpClientHandler
+
+- [MSDN Documentation](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclienthandler)
+- [Scott Hanselmans post With REFIT](https://www.hanselman.com/blog/UsingASPNETCore21sHttpClientFactoryWithRefitsRESTLibrary.aspx)
+
+---
+
 # Polly - Unit testing
 
 ---
 
-# Alternatives
-
-## Flurl
+# Alternatives - Flurl
 
     C#!
     // Flurl will use 1 HttpClient instance per host
@@ -154,10 +159,22 @@ await _retryPolicy.ExecuteAsync(
 
 ---
 
-# HttpClientHandler
+# Alteratives - DalSoft.RestClient
 
-- [MSDN Documentation](https://docs.microsoft.com/en-us/dotnet/api/system.net.http.httpclienthandler)
-- [Scott Hanselmans post With REFIT](https://www.hanselman.com/blog/UsingASPNETCore21sHttpClientFactoryWithRefitsRESTLibrary.aspx)
+    C#!
+    var config = new Config().UseFormUrlEncodedHandler();
+
+    dynamic restClient = new RestClient("https://jsonplaceholder.typicode.com", config);
+    var user = new User { name="foo", email="foo@bar.com" };
+
+    //POST name=foo&email=foo@bar.com  https://jsonplaceholder.typicode.com/users/1
+    result = await client
+      .Headers(new { ContentType = "application/x-www-form-urlencoded" })
+      .User(1)
+      .Post(user);
+
+- [Blogpost](https://code-maze.com/dalsoft-restclient-consume-any-rest-api/)
+- [Github](https://github.com/DalSoft/DalSoft.RestClient)
 
 ---
 
