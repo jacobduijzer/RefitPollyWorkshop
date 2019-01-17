@@ -180,7 +180,9 @@ await _retryPolicy.ExecuteAsync(
 
 # Setup sample project
 
-- Get the source from [GitHub](https://github.com/jacobduijzer/MyBeerInfo)
+### https://github.com/jacobduijzer/RefitPollyWorkshop
+
+- Get the source from [GitHub](https://github.com/jacobduijzer/RefitPollyWorkshop)
 - in folder src/api: npm install
 - in the folder src/api: npm run start
 - configure & run the console app
